@@ -53,3 +53,28 @@ Primeiro Slope (coef_): -6.036506995287072
 Intercept: 34.227364072604274
 ------------------------------
 MSE: 313.7228 | R2: 0.7405 | MAE: 13.4243 | MAPE: 13.8189
+
+
+Próximos modelos a serem testados: Árvores de Decisão (Decision Tree Regressor)
+
+Aqui você quebra totalmente o paradigma linear.
+
+    Como funciona: O algoritmo faz perguntas consecutivas sobre os dados (ex: "A média da massa atômica é maior que X?") para segmentar o dataset em subgrupos cada vez menores e tirar a média da temperatura crítica nesses grupos.
+
+    Por que testar: Árvores de decisão conseguem capturar interações não-lineares complexas entre as propriedades atômicas sem que você precise transformar as variáveis manualmente. Elas servem como uma ótima base para entender o próximo passo.
+
+3. Random Forest Regressor (O favorito para dados tabulares)
+
+Árvores de decisão sozinhas tendem a sofrer muito com overfitting (elas decoram o conjunto de treino). A solução para isso é o Random Forest.
+
+    Como funciona: Em vez de criar uma árvore, ele cria uma "floresta" com centenas de árvores de decisão diferentes, treinadas com subconjuntos aleatórios dos dados e das features. A predição final é a média do resultado de todas elas.
+
+    Por que testar: É um dos algoritmos tradicionais mais poderosos que existem para dados tabulares. Ele costuma performar incrivelmente bem no dataset de supercondutividade, lidando com o ruído e as mais de 80 colunas sem reclamar.
+
+4. Gradient Boosting (XGBoost, LightGBM ou HistGradientBoosting)
+
+Se o Random Forest cria árvores de forma independente, os modelos de Boosting criam árvores de forma sequencial.
+
+    Como funciona: Uma árvore inicial é criada. A segunda árvore é treinada especificamente para corrigir os erros (resíduos) da primeira. A terceira corrige os erros da segunda, e assim por diante.
+
+    Por que testar: No scikit-learn, você pode usar o HistGradientBoostingRegressor (que é excelente e muito rápido para datasets maiores). Fora dele, bibliotecas como XGBoost ou LightGBM são o estado da arte para competições de Machine Learning com dados tabulares. Eles provavelmente vão te dar o menor MSE de todos os testes.
