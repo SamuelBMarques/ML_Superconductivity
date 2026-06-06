@@ -1,0 +1,55 @@
+para cada dado tem se:
+    Mean = μ = (t1 + t2)/2 
+    Weighted mean = ν = (p1t1) + (p2t2) 
+    Geometric mean = (t1t2)1/2 
+    Weighted geometric mean = (t1)p1 (t2)p2 
+    Entropy = −w1 ln(w1) − w2 ln(w2) 
+    Weighted entropy = −A ln(A) − B ln(B) 
+    Range = t1 − t2 (t1 > t2) 
+    Weighted range = p1t1 − p2t2 
+    Standard deviation = [(1/2)((t1 − μ)2 + (t2 − μ)2)]1/2 
+    Weighted standard deviation = [p1(t1 − ν)2 + p2(t2 − ν)2)]1/2 
+
+Como na massa atômica:
+    "mean_atomic_mass"
+    "wtd_mean_atomic_mass"
+    "gmean_atomic_mass"
+    "wtd_gmean_atomic_mass"
+    "entropy_atomic_mass"
+    "wtd_entropy_atomic_mass"
+    "range_atomic_mass"
+    "wtd_range_atomic_mass"
+    "std_atomic_mass"
+    "wtd_std_atomic_mass"
+
+Dessa forma, as 82 colunas são na verdade 8 dados (mais as 10 manipulações) + número de elementos + temperatura crítica
+
+=== Configuração Executada ===
+Modelo: LassoCV
+Scaler: Standard
+------------------------------
+Melhor Alpha encontrado por CV: 0.02462509803224651
+Primeiro Slope (coef_): -4.7457961048664785
+Features mantidas (coef != 0): 63/81
+Intercept: 34.22736407260432
+------------------------------
+MSE: 321.7360 | R2: 0.7339 | MAE: 13.5955 | MAPE: 14.5140
+
+=== Configuração Executada ===
+Modelo: RidgeCV
+Scaler: Standard
+------------------------------
+Melhor Alpha encontrado por CV: 0.1
+Primeiro Slope (coef_): -6.03607639064807
+Intercept: 34.227364072604274
+------------------------------
+MSE: 313.6667 | R2: 0.7406 | MAE: 13.4215 | MAPE: 13.8555
+
+=== Configuração Executada ===
+Modelo: Linear
+Scaler: Standard
+------------------------------
+Primeiro Slope (coef_): -6.036506995287072
+Intercept: 34.227364072604274
+------------------------------
+MSE: 313.7228 | R2: 0.7405 | MAE: 13.4243 | MAPE: 13.8189
