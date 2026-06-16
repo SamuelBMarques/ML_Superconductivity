@@ -64,13 +64,13 @@ var_selector = VarianceThreshold(threshold=VARIANCE_THRESHOLD)
 x_train_var  = var_selector.fit_transform(x_train)
 x_test_var   = var_selector.transform(x_test)
 
-features_mantidas_var = X.columns[var_selector.get_support()].tolist()
-n_removidas_var = X.shape[1] - len(features_mantidas_var)
+kept_features_var = X.columns[var_selector.get_support()].tolist()
+n_removed_var = X.shape[1] - len(kept_features_var)
 print(f"[VarianceThreshold < {VARIANCE_THRESHOLD}]")
-print(f"  Removidas: {n_removidas_var}  |  Restantes: {len(features_mantidas_var)}")
+print(f"  Removed: {n_removed_var}  |  Kept: {len(kept_features_var)}")
 
 # --- Correlation Filter: remove redundant features---
-x_train_df = pd.DataFrame(x_train_var, columns=features_mantidas_var)
+x_train_df = pd.DataFrame(x_train_var, columns=kept_features_var)
 
 corr_matrix = x_train_df.corr().abs()
 upper_tri   = corr_matrix.where(
@@ -81,20 +81,20 @@ features_to_remove = [
     col for col in upper_tri.columns
     if any(upper_tri[col] > CORRELATION_THRESHOLD)
 ]
-features_selecionadas = [f for f in features_mantidas_var if f not in features_to_remove]
+selected_features = [f for f in kept_features_var if f not in features_to_remove]
 
-x_train_df_sel = x_train_df[features_selecionadas]
-x_test_df_sel  = pd.DataFrame(x_test_var, columns=features_mantidas_var)[features_selecionadas]
+x_train_df_sel = x_train_df[selected_features]
+x_test_df_sel  = pd.DataFrame(x_test_var, columns=kept_features_var)[selected_features]
 
 print(f"\n[Correlation Filter > {CORRELATION_THRESHOLD}]")
-print(f"  Removidas: {len(features_to_remove)}  |  Restantes: {len(features_selecionadas)}")
+print(f"  Removed: {len(features_to_remove)}  |  Kept: {len(selected_features)}")
 if features_to_remove:
     print(f"  Features removidas: {features_to_remove}")
 
 x_train_sel = x_train_df_sel.values
 x_test_sel  = x_test_df_sel.values
 
-print(f"\nFeatures após eliminação: {len(features_selecionadas)}")
+print(f"\nFeatures após eliminação: {len(selected_features)}")
 print("=" * 50)
 
 # ============================================================
@@ -126,12 +126,12 @@ if USE_POLYNOMIAL:
     x_train_final = poly.fit_transform(x_train_scaled)
     x_test_final  = poly.transform(x_test_scaled)
 
-    n_features_orig = len(features_selecionadas)
+    n_features_orig = len(selected_features)
     n_features_poly = x_train_final.shape[1]
-    n_novas = n_features_poly - n_features_orig
+    n_new = n_features_poly - n_features_orig
     print(f"[PolynomialFeatures degree={POLY_DEGREE}]")
     print(f"  Original features: {n_features_orig}")
-    print(f"  New features (x², x₁x₂, ...): {n_novas}")
+    print(f"  New features (x², x₁x₂, ...): {n_new}")
     print(f"  Total after squaring: {n_features_poly}")
     print("=" * 50)
 else:
