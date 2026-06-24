@@ -282,3 +282,94 @@ Negative predictions (physically impossible): 0 (0.0%)
 12      88.000  40.366667       47.633333
 13      36.000  44.000000        8.000000
 14       0.088   0.266267        0.178267
+
+Train size : 14883
+Val size   : 3190
+Test size  : 3190
+==================================================
+Loading pre-calculated features from Project/results/best_mrmr_features.json...
+==================================================
+[Starting Randomized Search trying 15 different configurations...]
+Fitting 3 folds for each of 15 candidates, totalling 45 fits
+[CV] END max_depth=20, max_features=log2, min_samples_leaf=2, min_samples_split=10, n_estimators=200; total time=  26.4s
+[CV] END max_depth=30, max_features=log2, min_samples_leaf=4, min_samples_split=5, n_estimators=200; total time=  34.8s
+[CV] END max_depth=20, max_features=log2, min_samples_leaf=2, min_samples_split=10, n_estimators=200; total time=  35.9s
+[CV] END max_depth=30, max_features=log2, min_samples_leaf=4, min_samples_split=5, n_estimators=200; total time=  41.5s
+[CV] END max_depth=20, max_features=log2, min_samples_leaf=2, min_samples_split=10, n_estimators=200; total time=  42.5s
+[CV] END max_depth=30, max_features=log2, min_samples_leaf=4, min_samples_split=5, n_estimators=200; total time=  46.1s
+[CV] END max_depth=None, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.2min
+[CV] END max_depth=None, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.2min
+[CV] END max_depth=None, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.4min
+[CV] END max_depth=20, max_features=0.3, min_samples_leaf=2, min_samples_split=10, n_estimators=50; total time= 6.3min
+[CV] END max_depth=20, max_features=0.3, min_samples_leaf=2, min_samples_split=10, n_estimators=50; total time= 6.3min
+[CV] END max_depth=30, max_features=log2, min_samples_leaf=1, min_samples_split=2, n_estimators=200; total time=  58.6s
+[CV] END max_depth=20, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=50; total time=10.6min
+[CV] END max_depth=30, max_features=log2, min_samples_leaf=1, min_samples_split=2, n_estimators=200; total time= 1.3min
+[CV] END max_depth=20, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=50; total time=10.7min
+[CV] END max_depth=20, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=50; total time=10.7min
+[CV] END max_depth=30, max_features=log2, min_samples_leaf=1, min_samples_split=2, n_estimators=200; total time= 1.2min
+[CV] END max_depth=20, max_features=0.3, min_samples_leaf=2, min_samples_split=10, n_estimators=50; total time= 6.0min
+[CV] END max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=300; total time= 3.8min
+[CV] END max_depth=10, max_features=0.3, min_samples_leaf=2, min_samples_split=5, n_estimators=200; total time=14.5min
+[CV] END max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=300; total time= 3.8min
+[CV] END max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=300; total time= 3.8min
+[CV] END max_depth=20, max_features=log2, min_samples_leaf=4, min_samples_split=10, n_estimators=50; total time=  11.9s
+[CV] END max_depth=20, max_features=log2, min_samples_leaf=4, min_samples_split=10, n_estimators=50; total time=  16.7s
+[CV] END max_depth=20, max_features=log2, min_samples_leaf=4, min_samples_split=10, n_estimators=50; total time=  16.0s
+[CV] END max_depth=10, max_features=0.3, min_samples_leaf=2, min_samples_split=5, n_estimators=200; total time=15.0min
+[CV] END max_depth=10, max_features=0.3, min_samples_leaf=2, min_samples_split=5, n_estimators=200; total time=15.4min
+[CV] END max_depth=None, max_features=0.3, min_samples_leaf=1, min_samples_split=10, n_estimators=200; total time=20.0min
+[CV] END max_depth=None, max_features=0.3, min_samples_leaf=1, min_samples_split=10, n_estimators=200; total time=20.2min
+[CV] END max_depth=None, max_features=0.3, min_samples_leaf=1, min_samples_split=10, n_estimators=200; total time=20.5min
+[CV] END max_depth=10, max_features=0.5, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=11.6min
+[CV] END max_depth=10, max_features=0.5, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=11.3min
+[CV] END max_depth=10, max_features=0.5, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=11.2min
+[CV] END max_depth=30, max_features=0.3, min_samples_leaf=4, min_samples_split=5, n_estimators=200; total time=14.2min
+[CV] END max_depth=None, max_features=0.5, min_samples_leaf=1, min_samples_split=10, n_estimators=200; total time=29.1min
+[CV] END max_depth=30, max_features=0.3, min_samples_leaf=4, min_samples_split=5, n_estimators=200; total time=14.3min
+[CV] END max_depth=None, max_features=0.5, min_samples_leaf=1, min_samples_split=10, n_estimators=200; total time=29.1min
+[CV] END max_depth=30, max_features=0.3, min_samples_leaf=4, min_samples_split=5, n_estimators=200; total time=14.4min
+[CV] END max_depth=20, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time=29.2min
+[CV] END max_depth=20, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time=29.3min
+[CV] END max_depth=20, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time=29.3min
+[CV] END max_depth=None, max_features=0.5, min_samples_leaf=1, min_samples_split=10, n_estimators=200; total time=29.3min
+[CV] END max_depth=10, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=300; total time=29.3min
+[CV] END max_depth=10, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=300; total time=29.3min
+[CV] END max_depth=10, max_features=0.5, min_samples_leaf=1, min_samples_split=5, n_estimators=300; total time=28.9min
+
+=> Best Parameters Found:
+{
+    "n_estimators": 200,
+    "min_samples_split": 5,
+    "min_samples_leaf": 1,
+    "max_features": 0.5,
+    "max_depth": 20
+}
+==================================================
+=== Final Test Metrics (RandomForest) ===
+MSE  : 85.7312 K²
+RMSE : 9.2591 K
+MAE  : 5.2211 K
+R²   : 0.9289
+MAPE : 5.6573
+Negative predictions (physically impossible): 0 (0.0%)
+
+--- First 15 samples from the test set ---
+    Real Value  Predicted  Absolute Error
+0       59.000  63.678049        4.678049
+1       14.800  14.786170        0.013830
+2       20.000  19.369651        0.630349
+3       70.000  62.039009        7.960991
+4        1.700   1.925305        0.225305
+5       73.000  74.138340        1.138340
+6       83.600  81.151603        2.448397
+7        2.810   2.263163        0.546837
+8       93.000  87.249060        5.750940
+9        9.350  10.268261        0.918261
+10       0.113   0.091591        0.021409
+11      23.000  33.315089       10.315089
+12      88.000  60.549798       27.450202
+13      36.000  45.232482        9.232482
+14       0.088   0.408862        0.320862
+
+Plot saved to: Project/results/grafico_randomforest_standard_poly2.png
