@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 import sklearn.preprocessing
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error, median_absolute_error
-from sklearn.feature_selection import VarianceThreshold
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
 from sklearn.preprocessing import PolynomialFeatures
-
+from mrmr import mrmr_regression
 
 # ============================================================
 # Settings
@@ -16,13 +15,13 @@ from sklearn.preprocessing import PolynomialFeatures
 MODEL  = "Linear"
 SCALER = "Standard"
 
-# Feature Elimination
-VARIANCE_THRESHOLD   = 0.01   # Removes features 
-CORRELATION_THRESHOLD = 0.95  # Remove features that are highly correlated with each other (redundant)
-
 # Feature Addition
 USE_POLYNOMIAL = True   # Activates feature squaring (x², x₁·x₂)
 POLY_DEGREE    = 2      # Degree (2 = quadratic)
+
+# MRMR Settings (Expanded Search Space)
+MAX_MRMR_FEATURES = 825 # Maximum number of features to rank
+K_CANDIDATES = [ 700, 725, 750, 762, 775, 787, 800, 810, 818, 825] # Cut-offs to test in validation
 
 # ============================================================
 # MODEL AND SCALER
@@ -37,7 +36,7 @@ scalers = {
 }
 
 # ============================================================
-# DATA LOADING
+# DATA LOADING & SPLITTING (Train / Val / Test)
 # ============================================================
 train_file_path = "Project/superconductivty+data/train.csv"
 labels_path     = "Project/superconductivty+data/unique_m.csv"
@@ -48,103 +47,106 @@ df_labels = pd.read_csv(labels_path)
 X = df.drop(columns=["critical_temp"])
 Y = df_labels["critical_temp"]
 
-x_train, x_test, y_train, y_test = train_test_split(
-    X, Y, test_size=0.2, random_state=78
+# 1. Split off 15% for the final TEST set
+x_temp, x_test, y_temp, y_test = train_test_split(
+    X, Y, test_size=0.15, random_state=78
+)
+
+# 2. Split the remaining 85% into TRAIN and VALIDATION
+x_train, x_val, y_train, y_val = train_test_split(
+    x_temp, y_temp, test_size=0.1765, random_state=78
 )
 
 print(f"Features originais: {X.shape[1]}")
+print(f"Train size: {x_train.shape[0]} | Val size: {x_val.shape[0]} | Test size: {x_test.shape[0]}")
 print("=" * 50)
 
-# ============================================================
-# ETAPA 1 — FEATURE ELIMINATION
-# ============================================================
-
-# --- VarianceThreshold: remove almost constant features ---
-var_selector = VarianceThreshold(threshold=VARIANCE_THRESHOLD)
-x_train_var  = var_selector.fit_transform(x_train)
-x_test_var   = var_selector.transform(x_test)
-
-kept_features_var = X.columns[var_selector.get_support()].tolist()
-n_removed_var = X.shape[1] - len(kept_features_var)
-print(f"[VarianceThreshold < {VARIANCE_THRESHOLD}]")
-print(f"  Removed: {n_removed_var}  |  Kept: {len(kept_features_var)}")
-
-# --- Correlation Filter: remove redundant features---
-x_train_df = pd.DataFrame(x_train_var, columns=kept_features_var)
-
-corr_matrix = x_train_df.corr().abs()
-upper_tri   = corr_matrix.where(
-    np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
-)
-
-features_to_remove = [
-    col for col in upper_tri.columns
-    if any(upper_tri[col] > CORRELATION_THRESHOLD)
-]
-selected_features = [f for f in kept_features_var if f not in features_to_remove]
-
-x_train_df_sel = x_train_df[selected_features]
-x_test_df_sel  = pd.DataFrame(x_test_var, columns=kept_features_var)[selected_features]
-
-print(f"\n[Correlation Filter > {CORRELATION_THRESHOLD}]")
-print(f"  Removed: {len(features_to_remove)}  |  Kept: {len(selected_features)}")
-if features_to_remove:
-    print(f"  Features removidas: {features_to_remove}")
-
-x_train_sel = x_train_df_sel.values
-x_test_sel  = x_test_df_sel.values
-
-print(f"\nFeatures após eliminação: {len(selected_features)}")
-print("=" * 50)
-
-# ============================================================
-# PreProcessing: Scaling
-# Sclaing before polynomial features is crucial to prevent the new squared/interacted features from having vastly different magnitudes,
-# which can help the model converge better and ensure that the optimization process is not dominated by features with larger scales.
-# ============================================================
-scaler = scalers[SCALER]
-
-if scaler is not None:
-    x_train_scaled = scaler.fit_transform(x_train_sel)
-    x_test_scaled  = scaler.transform(x_test_sel)
-else:
-    x_train_scaled = x_train_sel
-    x_test_scaled  = x_test_sel
-
-# ============================================================
-# FEATURE ADDITION (POLYNOMIAL / SQUARING)
-# degree=2 adds: x₁², x₂², ..., xₙ² (quadráticas)
-#                  + x₁·x₂, x₁·x₃, ... (interações)
-# lets the model capture non-linear relationships without needing a non-linear model
-# ============================================================
 if USE_POLYNOMIAL:
     poly = PolynomialFeatures(
         degree=POLY_DEGREE,
         include_bias=False,      
         interaction_only=False    
     )
-    x_train_final = poly.fit_transform(x_train_scaled)
-    x_test_final  = poly.transform(x_test_scaled)
+    x_train_poly = poly.fit_transform(x_train)
+    x_val_poly   = poly.transform(x_val)
+    x_test_poly  = poly.transform(x_test)
 
-    n_features_orig = len(selected_features)
-    n_features_poly = x_train_final.shape[1]
-    n_new = n_features_poly - n_features_orig
+    feature_names = poly.get_feature_names_out(X.columns)
+    
     print(f"[PolynomialFeatures degree={POLY_DEGREE}]")
-    print(f"  Original features: {n_features_orig}")
-    print(f"  New features (x², x₁x₂, ...): {n_new}")
-    print(f"  Total after squaring: {n_features_poly}")
+    print(f"  Original features: {X.shape[1]}")
+    print(f"  Total after squaring/interactions: {x_train_poly.shape[1]}")
     print("=" * 50)
 else:
-    x_train_final = x_train_scaled
-    x_test_final  = x_test_scaled
+    x_train_poly = x_train.values
+    x_val_poly   = x_val.values
+    x_test_poly  = x_test.values
+    feature_names = X.columns.tolist()
 
 # ============================================================
-# TRAINING
+# SCALING (Post-Expansion)
+# ============================================================
+scaler = scalers[SCALER]
+
+if scaler is not None:
+    x_train_scaled = scaler.fit_transform(x_train_poly)
+    x_val_scaled   = scaler.transform(x_val_poly)
+    x_test_scaled  = scaler.transform(x_test_poly)
+else:
+    x_train_scaled = x_train_poly
+    x_val_scaled   = x_val_poly
+    x_test_scaled  = x_test_poly
+
+# ============================================================
+# MRMR FEATURE SELECTION & VALIDATION
+# ============================================================
+df_train_mrmr = pd.DataFrame(x_train_scaled, columns=feature_names)
+df_val_mrmr   = pd.DataFrame(x_val_scaled, columns=feature_names)
+df_test_mrmr  = pd.DataFrame(x_test_scaled, columns=feature_names)
+
+print(f"\n[Starting MRMR Ranking for top {MAX_MRMR_FEATURES} features...]")
+# 1. Run MRMR exactly ONCE to rank the top MAX_MRMR_FEATURES
+ranked_features = mrmr_regression(X=df_train_mrmr, y=y_train.values, K=MAX_MRMR_FEATURES)
+
+# 2. Use the validation set to find the optimal cut-off K
+best_k = None
+best_val_rmse = float('inf')
+best_features = []
+
+print(f"\n[Validating Cut-offs for Top K Features]")
+for k in K_CANDIDATES:
+    if k > len(ranked_features):
+        continue
+        
+    features_to_test = ranked_features[:k]
+    
+    temp_model = LinearRegression()
+    temp_model.fit(df_train_mrmr[features_to_test], y_train)
+    
+    val_preds = temp_model.predict(df_val_mrmr[features_to_test])
+    val_rmse = np.sqrt(mean_squared_error(y_val, val_preds))
+    
+    print(f"  Tested Top K={k:3d} | Validation RMSE: {val_rmse:.4f}")
+    
+    if val_rmse < best_val_rmse:
+        best_val_rmse = val_rmse
+        best_k = k
+        best_features = features_to_test
+
+print(f"\n=> Best K selected: {best_k} (Validation RMSE: {best_val_rmse:.4f})")
+print("=" * 50)
+
+# 3. Finalize datasets with the optimal features
+x_train_final = df_train_mrmr[best_features].values
+x_test_final  = df_test_mrmr[best_features].values
+
+# ============================================================
+# TRAINING (Final Model)
 # ============================================================
 print(f"=== Settings ===")
 print(f"Model: {MODEL}")
 print(f"Scaler: {SCALER}")
-print(f"Polynomial: {'Yes (degree=' + str(POLY_DEGREE) + ')' if USE_POLYNOMIAL else 'NNo'}")
+print(f"Polynomial: {'Yes (degree=' + str(POLY_DEGREE) + ')' if USE_POLYNOMIAL else 'No'}")
 print("-" * 40)
 
 model = models[MODEL]
@@ -156,7 +158,7 @@ if hasattr(model, 'intercept_'):
 print("-" * 40)
 
 # ============================================================
-# AVALIAÇÃO
+# EVALUATION(On Unseen Test Data)
 # ============================================================
 y_pred = model.predict(x_test_final)
 
@@ -164,21 +166,19 @@ def evaluate_model(y_true, y_pred):
     mse    = mean_squared_error(y_true, y_pred)
     rmse   = np.sqrt(mean_squared_error(y_true, y_pred))
     mae    = mean_absolute_error(y_true, y_pred)
-    med_ae = median_absolute_error(y_true, y_pred)
     r2     = r2_score(y_true, y_pred)
     mape   = mean_absolute_percentage_error(y_true, y_pred)
     
     print(f"MSE      : {mse:.4f} K²")
     print(f"RMSE     : {rmse:.4f} K ")
     print(f"MAE      : {mae:.4f} K ")
-    print(f"Median AE: {med_ae:.4f} K")
     print(f"R²       : {r2:.4f}")
     print(f"MAPE     : {mape:.4f}")
  
     n_neg = (y_pred < 0).sum()
     print(f"Negative preds (physically impossible): {n_neg} ({100 * n_neg / len(y_pred):.1f}%)")
  
-    return {"rmse": rmse, "mae": mae, "median_ae": med_ae, "r2": r2, "mape": mape}
+    return {"rmse": rmse, "mae": mae, "r2": r2, "mape": mape}
  
 metrics = evaluate_model(y_test, y_pred)
 
@@ -194,9 +194,6 @@ def compare_predictions(y_true, y_pred, num_samples=15):
 
     print(f"\n--- First {num_samples} samples from the test set ---")
     print(comparison_df.head(num_samples))
-
-    n_negatives = (y_pred < 0).sum()
-    print(f"\nNegative predictions (physically impossible): {n_negatives} ({100*n_negatives/len(y_pred):.1f}%)")
 
     plt.figure(figsize=(8, 6))
     plt.scatter(y_true, y_pred, alpha=0.5, color="blue", edgecolor="k")

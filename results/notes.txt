@@ -24,26 +24,6 @@ Como na massa atômica:
 
 Dessa forma, as 82 colunas são na verdade 8 dados (mais as 10 manipulações) + número de elementos + temperatura crítica
 
-=== Configuração Executada ===
-Modelo: LassoCV
-Scaler: Standard
-------------------------------
-Melhor Alpha encontrado por CV: 0.02462509803224651
-Primeiro Slope (coef_): -4.7457961048664785
-Features mantidas (coef != 0): 63/81
-Intercept: 34.22736407260432
-------------------------------
-MSE: 321.7360 | R2: 0.7339 | MAE: 13.5955 | MAPE: 14.5140
-
-=== Configuração Executada ===
-Modelo: RidgeCV
-Scaler: Standard
-------------------------------
-Melhor Alpha encontrado por CV: 0.1
-Primeiro Slope (coef_): -6.03607639064807
-Intercept: 34.227364072604274
-------------------------------
-MSE: 313.6667 | R2: 0.7406 | MAE: 13.4215 | MAPE: 13.8555
 
 === Configuração Executada ===
 Modelo: Linear
@@ -55,41 +35,250 @@ Intercept: 34.227364072604274
 MSE: 313.7228 | R2: 0.7405 | MAE: 13.4243 | MAPE: 13.8189
 
 
-Próximos modelos a serem testados: 
-
-    Árvores de Decisão (Decision Tree Regressor)
-    Random Forest Regressor 
-    Gradient Boosting (XGBoost, LightGBM ou HistGradientBoosting)
-
-
-=== Configuração Executada ===
-Modelo: Linear
+==================================================
+=== Settings ===
+Model: Linear
 Scaler: Standard
-Polynomial: Sim (degree=2)
+Polynomial: Yes (degree=2)
 ----------------------------------------
-Primeiro coef_: 76.144554
 Intercept: 45.5522
 ----------------------------------------
-MSE: 195.5428 | R²: 0.8383 | MAE: 9.5273 | MAPE: 15.2938
+MSE      : 195.5428 K²
+RMSE     : 13.9837 K 
+MAE      : 9.5273 K 
+R²       : 0.8383
+MAPE     : 15.2938
+Negative preds (physically impossible): 337 (7.9%)
 
---- Primeiras 15 amostras do teste ---
-    Valor Real  Valor Predito  Erro Absoluto
-0       59.000      73.629456      14.629456
-1       14.800      11.021787       3.778213
-2       20.000      13.771715       6.228285
-3       70.000      73.639532       3.639532
-4        1.700       1.531886       0.168114
-5       73.000      70.240131       2.759869
-6       83.600      66.384582      17.215418
-7        2.810       1.991105       0.818895
-8       93.000      72.299082      20.700918
-9        9.350     -11.461704      20.811704
-10       0.113      -5.536430       5.649430
-11      23.000      68.723570      45.723570
-12      88.000      53.055271      34.944729
-13      36.000      54.791809      18.791809
-14       0.088       3.120712       3.032712
+--- First 15 samples from the test set ---
+    Real Value  Predicted  Absolute Error
+0       59.000  73.629456       14.629456
+1       14.800  11.021787        3.778213
+2       20.000  13.771715        6.228285
+3       70.000  73.639532        3.639532
+4        1.700   1.531886        0.168114
+5       73.000  70.240131        2.759869
+6       83.600  66.384582       17.215418
+7        2.810   1.991105        0.818895
+8       93.000  72.299082       20.700918
+9        9.350 -11.461704       20.811704
+10       0.113  -5.536430        5.649430
+11      23.000  68.723570       45.723570
+12      88.000  53.055271       34.944729
+13      36.000  54.791809       18.791809
+14       0.088   3.120712        3.032712
 
-Predições negativas (fisicamente impossível): 337 (7.9%)
+Negative predictions (physically impossible): 337 (7.9%)
 
-Gráfico salvo em: Project/results/grafico_linear_standard_poly2.png
+
+Próximos modelos a serem testados: 
+
+    KNN  Regressor
+    Random Forest Regressor 
+    
+Minimum redundancy maximum 
+Não testar Gradient Boosting (XGBoost, LightGBM ou HistGradientBoosting) porque o professor não vai ensinar e pediu que não.
+Otimizar os parâmetros do random forest e decision tree e justificar cada escolha (Random selection por exemplo).
+Realizar feature selection automatizada (atualmente é feita "manualmente" eliminam se os que não tem variância(0) e os pares com mais de 
+                                        95% de correlação entre si (23, elimina se apenas 1 de cada par)).
+RANDOM selection
+
+Apresentação:
+15 Minutos de apresentação (Esperado pelo professor). Ele quer que use todo o tempo.
+Upload do PDF de apresentação (tem que ser PDF).
+Sem outline,que é sem apresentar no começo o que vai apresentar.
+As perguntas são individuais, um não pode falar na pergunta do outro.
+Nos apresentar no início.
+Máximo de 3 dígitos depois do ponto (ex. 0.083).
+Não colocar prints do Terminal ou do Console Python.
+
+Features originais: 81
+Train size: 14883 | Val size: 3190 | Test size: 3190
+==================================================
+[PolynomialFeatures degree=2]
+  Original features: 81
+  Total after squaring/interactions: 3402
+==================================================
+
+[Starting MRMR Ranking for top 1000 features... This will take a while]
+  2%|██                                                                                                      | 20/1000 [00:11<10:00,  1.63it/s]^100%|██████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [10:44<00:00,  1.55it/s]
+
+[Validating Cut-offs for Top K Features]
+  Tested Top K=300 | Validation RMSE: 14.9095
+  Tested Top K=400 | Validation RMSE: 14.4705
+  Tested Top K=500 | Validation RMSE: 14.3667
+  Tested Top K=600 | Validation RMSE: 14.2621
+  Tested Top K=700 | Validation RMSE: 14.1354
+  Tested Top K=800 | Validation RMSE: 14.0697
+  Tested Top K=825 | Validation RMSE: 14.0719
+  Tested Top K=850 | Validation RMSE: 14.1479
+  Tested Top K=875 | Validation RMSE: 14.0992
+  Tested Top K=900 | Validation RMSE: 14.1007
+  Tested Top K=1000 | Validation RMSE: 14.1976
+
+=> Best K selected: 800 (Validation RMSE: 14.0697)
+==================================================
+=== Settings ===
+Model: Linear
+Scaler: Standard
+Polynomial: Yes (degree=2)
+----------------------------------------
+Intercept: 34.4572
+----------------------------------------
+MSE      : 197.0879 K²
+RMSE     : 14.0388 K 
+MAE      : 9.8363 K 
+R²       : 0.8366
+MAPE     : 9.2897
+Negative preds (physically impossible): 204 (6.4%)
+
+--- First 15 samples from the test set ---
+    Real Value  Predicted  Absolute Error
+0       59.000  80.682601       21.682601
+1       14.800  13.007535        1.792465
+2       20.000  13.691781        6.308219
+3       70.000  75.537511        5.537511
+4        1.700   6.777403        5.077403
+5       73.000  74.695267        1.695267
+6       83.600  59.744492       23.855508
+7        2.810   5.663700        2.853700
+8       93.000  75.906940       17.093060
+9        9.350   4.365464        4.984536
+10       0.113   0.704579        0.591579
+11      23.000  67.803744       44.803744
+12      88.000  61.663885       26.336115
+13      36.000  58.807385       22.807385
+14       0.088  11.982610       11.894610
+
+Graphic saved to: Project/results/grafico_linear_standard_poly2.png
+(sklearn-env) samuel@samuel-Vivobook-ASUSLaptop-K5504VN-K5504VN:~/Documents/THD/MachineLearning$ /home/samuel/Documents/THD/MachineLearning/sklearn-env/bin/python /home/samuel/Documents/THD/MachineLearning/Project/linear_regression.py
+Features originais: 81
+Train size: 14883 | Val size: 3190 | Test size: 3190
+==================================================
+[PolynomialFeatures degree=2]
+  Original features: 81
+  Total after squaring/interactions: 3402
+==================================================
+
+[Starting MRMR Ranking for top 900 features... This will take a while]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████| 900/900 [09:30<00:00,  1.58it/s]
+
+[Validating Cut-offs for Top K Features]
+  Tested Top K=700 | Validation RMSE: 14.1354
+  Tested Top K=800 | Validation RMSE: 14.0697
+  Tested Top K=810 | Validation RMSE: 14.0849
+  Tested Top K=818 | Validation RMSE: 14.0838
+  Tested Top K=825 | Validation RMSE: 14.0719
+  Tested Top K=850 | Validation RMSE: 14.1479
+  Tested Top K=875 | Validation RMSE: 14.0992
+  Tested Top K=900 | Validation RMSE: 14.1007
+
+=> Best K selected: 800 (Validation RMSE: 14.0697)
+==================================================
+=== Settings ===
+Model: Linear
+Scaler: Standard
+Polynomial: Yes (degree=2)
+----------------------------------------
+Intercept: 34.4572
+----------------------------------------
+MSE      : 197.0879 K²
+RMSE     : 14.0388 K 
+MAE      : 9.8363 K 
+R²       : 0.8366
+MAPE     : 9.2897
+Negative preds (physically impossible): 204 (6.4%)
+
+--- First 15 samples from the test set ---
+    Real Value  Predicted  Absolute Error
+0       59.000  80.682601       21.682601
+1       14.800  13.007535        1.792465
+2       20.000  13.691781        6.308219
+3       70.000  75.537511        5.537511
+4        1.700   6.777403        5.077403
+5       73.000  74.695267        1.695267
+6       83.600  59.744492       23.855508
+7        2.810   5.663700        2.853700
+8       93.000  75.906940       17.093060
+9        9.350   4.365464        4.984536
+10       0.113   0.704579        0.591579
+11      23.000  67.803744       44.803744
+12      88.000  61.663885       26.336115
+13      36.000  58.807385       22.807385
+14       0.088  11.982610       11.894610
+
+
+  Tested Top K=700 | Validation RMSE: 14.1354
+  Tested Top K=800 | Validation RMSE: 14.0697
+  Tested Top K=810 | Validation RMSE: 14.0849
+  Tested Top K=818 | Validation RMSE: 14.0838
+  Tested Top K=825 | Validation RMSE: 14.0719
+  Tested Top K=850 | Validation RMSE: 14.1479
+  Tested Top K=875 | Validation RMSE: 14.0992
+  Tested Top K=900 | Validation RMSE: 14.1007
+  Tested Top K=1000 | Validation RMSE: 14.1976
+  Tested Top K=1100 | Validation RMSE: 14.3025
+  Tested Top K=1200 | Validation RMSE: 14.5161
+  Tested Top K=1300 | Validation RMSE: 14.6027
+  Tested Top K=1400 | Validation RMSE: 14.6396
+  Tested Top K=1500 | Validation RMSE: 15.0850
+
+  Tested Top K=700 | Validation RMSE: 14.1354
+  Tested Top K=725 | Validation RMSE: 14.0536
+  Tested Top K=750 | Validation RMSE: 14.0403
+  Tested Top K=775 | Validation RMSE: 14.0285
+  Tested Top K=800 | Validation RMSE: 14.0697
+  Tested Top K=810 | Validation RMSE: 14.0849
+  Tested Top K=818 | Validation RMSE: 14.0838
+  Tested Top K=825 | Validation RMSE: 14.0719
+
+==================================================
+[Validating KNN Hyperparameters]
+  Tested Neighbors k= 1 | Validation RMSE: 11.2950
+  Tested Neighbors k= 3 | Validation RMSE: 10.2247
+  Tested Neighbors k= 5 | Validation RMSE: 10.4274
+  Tested Neighbors k= 7 | Validation RMSE: 10.8080
+  Tested Neighbors k= 9 | Validation RMSE: 11.1771
+  Tested Neighbors k=11 | Validation RMSE: 11.3873
+  Tested Neighbors k=13 | Validation RMSE: 11.6543
+  Tested Neighbors k=15 | Validation RMSE: 11.8794
+  Tested Neighbors k=20 | Validation RMSE: 12.3492
+  Tested Neighbors k=25 | Validation RMSE: 12.7101
+  Tested Neighbors k=30 | Validation RMSE: 12.9588
+  Tested Neighbors k=40 | Validation RMSE: 13.3395
+  Tested Neighbors k=50 | Validation RMSE: 13.6243
+
+=> Best KNN Hyperparameter selected: k=3 (Validation RMSE: 10.2247)
+==================================================
+=== Final Model Settings ===
+Model      : KNN Regressor
+Scaler     : Standard
+Polynomial : degree=2
+Neighbors  : k=3
+Features   : 775
+Final Train Size (train+val): 18073
+----------------------------------------
+MSE  : 111.7256 K²
+RMSE : 10.5700 K
+MAE  : 5.5568 K
+R²   : 0.9074
+MAPE : 6.6990
+Negative predictions (physically impossible): 0 (0.0%)
+
+--- First 15 samples from the test set ---
+    Real Value  Predicted  Absolute Error
+0       59.000  63.333333        4.333333
+1       14.800  15.220000        0.420000
+2       20.000  18.300000        1.700000
+3       70.000  64.033333        5.966667
+4        1.700   1.756667        0.056667
+5       73.000  81.833333        8.833333
+6       83.600  82.100000        1.500000
+7        2.810   2.166667        0.643333
+8       93.000  91.333333        1.666667
+9        9.350  10.400000        1.050000
+10       0.113   0.273667        0.160667
+11      23.000  40.233333       17.233333
+12      88.000  40.366667       47.633333
+13      36.000  44.000000        8.000000
+14       0.088   0.266267        0.178267
