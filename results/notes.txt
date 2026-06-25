@@ -373,3 +373,14 @@ Negative predictions (physically impossible): 0 (0.0%)
 14       0.088   0.408862        0.320862
 
 Plot saved to: Project/results/grafico_randomforest_standard_poly2.png
+
+How to follow with the feature selection (foward selection for each model?)
+Error measure to decide
+
+
+Foward selection or backward elimination with the 100 best ranked features
+find the best k for those features
+run the forward selection again for KNN
+retry to find the k for those new selected features
+i can use MAE because of the outlier 
+run random search with literally every parameter and rank the 10 best. 

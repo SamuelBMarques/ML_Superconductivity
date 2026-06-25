@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import sklearn.preprocessing
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import PolynomialFeatures
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
+from sklearn.metrics import (mean_squared_error, r2_score,
+                             mean_absolute_error, mean_absolute_percentage_error)
 
 # ============================================================
 # Settings
@@ -17,19 +18,22 @@ SCALER = "Standard"
 USE_POLYNOMIAL = True
 POLY_DEGREE    = 2
 
-# We can test a dense range of neighbors to find the sweet spot
 NEIGHBORS_CANDIDATES = [1, 3, 4, 5, 6, 7, 9, 11, 13, 15, 20, 25, 30, 40, 50]
 
+# Paths
+selection_file_path = "Project/results/best_selection_features.json"
+knn_cache_path      = "Project/results/best_knn_k.json"
+
 # ============================================================
-# SCALER SELECTION
+# SCALERS
 # ============================================================
 scalers = {
     "Standard": sklearn.preprocessing.StandardScaler(),
-    "None": None,
+    "None"    : None,
 }
 
 # ============================================================
-# DATA LOADING 
+# DATA LOADING
 # ============================================================
 train = pd.read_csv("Project/splits/train.csv")
 val   = pd.read_csv("Project/splits/val.csv")
@@ -58,103 +62,144 @@ if USE_POLYNOMIAL:
     x_test_poly  = poly.transform(x_test)
 
     feature_names = poly.get_feature_names_out(x_train.columns)
+
+    print(f"[PolynomialFeatures degree={POLY_DEGREE}]")
+    print(f"  Original features        : {x_train.shape[1]}")
+    print(f"  Features after expansion : {x_train_poly.shape[1]}")
+    print("=" * 50)
 else:
-    x_train_poly = x_train.values
-    x_val_poly   = x_val.values
-    x_test_poly  = x_test.values
+    x_train_poly  = x_train.values
+    x_val_poly    = x_val.values
+    x_test_poly   = x_test.values
     feature_names = x_train.columns.tolist()
 
-# Convert back to temporary DataFrames so we can match MRMR feature names easily
-df_train_poly = pd.DataFrame(x_train_poly, columns=feature_names)
-df_val_poly   = pd.DataFrame(x_val_poly,   columns=feature_names)
-df_test_poly  = pd.DataFrame(x_test_poly,  columns=feature_names)
-
 # ============================================================
-# LOAD PRE-CALCULATED MRMR FEATURES
-# ============================================================
-features_file_path = "Project/results/best_mrmr_features.json"
-
-NUM_FEATURES_TO_USE = 775
-
-if not os.path.exists(features_file_path):
-    raise FileNotFoundError(
-        f"Could not find '{features_file_path}'. Please run your MRMR selection "
-        "script first and save the JSON feature list!"
-    )
-
-print(f"Loading pre-calculated features from {features_file_path}...")
-with open(features_file_path, "r") as f:
-    ranked_features = json.load(f)
-
-ranked_features = ranked_features[:NUM_FEATURES_TO_USE]
-
-print(f"Loaded {len(ranked_features)} features successfully. Skipping MRMR recalculation!")
-print("=" * 50)
-
-# Keep only the columns selected by MRMR from our expanded feature sets
-x_train_mrmr = df_train_poly[ranked_features]
-x_val_mrmr   = df_val_poly[ranked_features]
-x_test_mrmr  = df_test_poly[ranked_features]
-
-# ============================================================
-# SCALING
+# SCALING — fit only on train
+# Scaling happens before feature selection to match the pipeline
+# in which the selection features were originally computed.
 # ============================================================
 scaler = scalers[SCALER]
 
 if scaler is not None:
-    x_train_scaled = scaler.fit_transform(x_train_mrmr)
-    x_val_scaled   = scaler.transform(x_val_mrmr)
-    x_test_scaled  = scaler.transform(x_test_mrmr)
+    x_train_scaled = scaler.fit_transform(x_train_poly)
+    x_val_scaled   = scaler.transform(x_val_poly)
+    x_test_scaled  = scaler.transform(x_test_poly)
 else:
-    x_train_scaled = x_train_mrmr.values
-    x_val_scaled   = x_val_mrmr.values
-    x_test_scaled  = x_test_mrmr.values
+    x_train_scaled = x_train_poly
+    x_val_scaled   = x_val_poly
+    x_test_scaled  = x_test_poly
+
+df_train_scaled = pd.DataFrame(x_train_scaled, columns=feature_names)
+df_val_scaled   = pd.DataFrame(x_val_scaled,   columns=feature_names)
+df_test_scaled  = pd.DataFrame(x_test_scaled,  columns=feature_names)
 
 # ============================================================
-# TUNING KNN VIA VALIDATION LOOP
+# LOAD PRE-CALCULATED SELECTION FEATURES
+# These were determined by forward selection (LinearRegression
+# proxy) over the top 100 MRMR features and saved to JSON.
 # ============================================================
-best_k = None
-best_val_rmse = float('inf')
+if not os.path.exists(selection_file_path):
+    raise FileNotFoundError(
+        f"Could not find '{selection_file_path}'. "
+        "Run crit_temp_linearregression.py first to generate the selection."
+    )
 
-print("[Validating KNN Hyperparameters]")
-for k in NEIGHBORS_CANDIDATES:
-    temp_knn = KNeighborsRegressor(n_neighbors=k, weights='distance')
-    temp_knn.fit(x_train_scaled, y_train)
-    
-    val_preds = temp_knn.predict(x_val_scaled)
-    val_rmse = np.sqrt(mean_squared_error(y_val, val_preds))
-    
-    print(f"  Tested Neighbors k={k:2d} | Validation RMSE: {val_rmse:.4f}")
-    
-    if val_rmse < best_val_rmse:
-        best_val_rmse = val_rmse
-        best_k = k
+print(f"Loading selection features from {selection_file_path}...")
+with open(selection_file_path, "r") as f:
+    saved_selection = json.load(f)
 
-print(f"\n=> Best KNN Hyperparameter selected: k={best_k} (Validation RMSE: {best_val_rmse:.4f})")
+best_features   = saved_selection["features"]
+selection_method = saved_selection["method"]
+selection_rmse  = saved_selection["val_rmse"]
+
+print(f"Loaded {len(best_features)} features "
+      f"(method: {selection_method}, LinearRegression Val RMSE: {selection_rmse:.4f})")
 print("=" * 50)
 
-# ============================================================
-# FINAL TRAINING (Combine Train + Val)
-# ============================================================
-x_trainval_final = np.vstack([x_train_scaled, x_val_scaled])
-y_trainval       = pd.concat([y_train, y_val]).reset_index(drop=True)
+# Apply feature selection
+x_train_final = df_train_scaled[best_features].values
+x_val_final   = df_val_scaled[best_features].values
+x_test_final  = df_test_scaled[best_features].values
 
-print(f"=== Final Model Settings ===")
-print(f"Model      : {MODEL} Regressor")
+# ============================================================
+# KNN HYPERPARAMETER TUNING (k) — cached after first run
+# ============================================================
+if os.path.exists(knn_cache_path):
+    print(f"Loading cached KNN hyperparameters from {knn_cache_path}...")
+    with open(knn_cache_path, "r") as f:
+        knn_cache = json.load(f)
+    best_k        = knn_cache["best_k"]
+    best_val_rmse = knn_cache["val_rmse"]
+    print(f"Best k={best_k} (Val RMSE: {best_val_rmse:.4f}). Skipping tuning.")
+    print("=" * 50)
+
+else:
+    print("[Tuning KNN: k neighbors]")
+    best_k        = None
+    best_val_rmse = float("inf")
+
+    for k in NEIGHBORS_CANDIDATES:
+        knn = KNeighborsRegressor(n_neighbors=k, weights="distance")
+        knn.fit(x_train_final, y_train)
+
+        val_preds = knn.predict(x_val_final)
+        val_rmse  = np.sqrt(mean_squared_error(y_val, val_preds))
+
+        print(f"  k={k:2d}  |  Val RMSE: {val_rmse:.4f}")
+
+        if val_rmse < best_val_rmse:
+            best_val_rmse = val_rmse
+            best_k        = k
+
+    print(f"\n  => Best k={best_k}  |  Val RMSE: {best_val_rmse:.4f}")
+    print("=" * 50)
+
+    os.makedirs("Project/results", exist_ok=True)
+    with open(knn_cache_path, "w") as f:
+        json.dump({"best_k": best_k, "val_rmse": best_val_rmse}, f, indent=2)
+    print(f"KNN hyperparameters saved to {knn_cache_path}")
+
+# ============================================================
+# FINAL TRAINING — refit scaler on train+val, then train KNN
+#
+# The scaler used during k-tuning was fit on train only (correct
+# for hyperparameter selection). For the final model we refit on
+# train+val so the full available data informs the scaling.
+# ============================================================
+x_trainval_poly = np.vstack([x_train_poly, x_val_poly])
+y_trainval      = pd.concat([y_train, y_val]).reset_index(drop=True)
+
+if scaler is not None:
+    final_scaler        = sklearn.preprocessing.StandardScaler()
+    x_trainval_scaled_f = final_scaler.fit_transform(x_trainval_poly)
+    x_test_scaled_f     = final_scaler.transform(x_test_poly)
+else:
+    x_trainval_scaled_f = x_trainval_poly
+    x_test_scaled_f     = x_test_poly
+
+df_trainval_f = pd.DataFrame(x_trainval_scaled_f, columns=feature_names)
+df_test_f     = pd.DataFrame(x_test_scaled_f,     columns=feature_names)
+
+x_trainval_final = df_trainval_f[best_features].values
+x_test_final_f   = df_test_f[best_features].values
+
+print(f"\n=== Final Training ===")
+print(f"Model      : {MODEL}")
 print(f"Scaler     : {SCALER}")
 print(f"Polynomial : degree={POLY_DEGREE}" if USE_POLYNOMIAL else "Polynomial : No")
+print(f"Features   : {len(best_features)} (from {selection_method} selection)")
 print(f"Neighbors  : k={best_k}")
-print(f"Features   : {len(ranked_features)}")
-print(f"Final Train Size (train+val): {x_trainval_final.shape[0]}")
+print(f"Train size : {x_trainval_final.shape[0]} (train+val)")
 print("-" * 40)
 
-final_model = KNeighborsRegressor(n_neighbors=best_k, weights='distance')
+final_model = KNeighborsRegressor(n_neighbors=best_k, weights="distance")
 final_model.fit(x_trainval_final, y_trainval)
 
 # ============================================================
-# EVALUATION 
+# EVALUATION (test set — never touched until here)
 # ============================================================
-y_pred = final_model.predict(x_test_scaled)
+y_pred = final_model.predict(x_test_final_f)
+
 
 def evaluate_model(y_true, y_pred):
     mse  = mean_squared_error(y_true, y_pred)
@@ -170,14 +215,16 @@ def evaluate_model(y_true, y_pred):
     print(f"MAPE : {mape:.4f}")
 
     n_neg = (y_pred < 0).sum()
-    print(f"Negative predictions (physically impossible): {n_neg} ({100 * n_neg / len(y_pred):.1f}%)")
+    print(f"Negative predictions (physically impossible): "
+          f"{n_neg} ({100 * n_neg / len(y_pred):.1f}%)")
 
     return {"rmse": rmse, "mae": mae, "r2": r2, "mape": mape}
+
 
 metrics = evaluate_model(y_test, y_pred)
 
 # ============================================================
-# PLOT RESULTS
+# PLOT
 # ============================================================
 def plot_predictions(y_true, y_pred):
     comparison_df = pd.DataFrame({
@@ -200,7 +247,7 @@ def plot_predictions(y_true, y_pred):
     )
 
     poly_tag = f"_poly{POLY_DEGREE}" if USE_POLYNOMIAL else ""
-    title = f"Real vs. Predicted — {MODEL} (k={best_k}, {SCALER}{poly_tag})"
+    title    = f"Real vs. Predicted — {MODEL} (k={best_k}, {SCALER}{poly_tag})"
     plt.title(title)
     plt.xlabel("Real Value (K)")
     plt.ylabel("Predicted Value (K)")
@@ -211,5 +258,6 @@ def plot_predictions(y_true, y_pred):
     name = f"Project/results/grafico_{MODEL.lower()}_k{best_k}_{SCALER.lower()}{poly_tag}.png"
     plt.savefig(name, dpi=300, bbox_inches="tight")
     print(f"\nPlot saved to: {name}")
+
 
 plot_predictions(y_test, y_pred)

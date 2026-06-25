@@ -1,0 +1,13 @@
+{
+  "params": {
+    "n_estimators": 300,
+    "max_depth": 20,
+    "min_samples_split": 5,
+    "min_samples_leaf": 8,
+    "max_leaf_nodes": null,
+    "max_features": 0.4,
+    "bootstrap": false,
+    "max_samples": null
+  },
+  "val_rmse": 9.747500842001882
+}
