@@ -1,0 +1,21 @@
+{
+  "method": "Forward",
+  "val_rmse": 9.585563860817642,
+  "k": 5,
+  "features": [
+    "entropy_atomic_radius",
+    "wtd_gmean_Valence",
+    "wtd_std_FusionHeat",
+    "gmean_ElectronAffinity",
+    "std_atomic_mass",
+    "entropy_atomic_mass",
+    "wtd_mean_FusionHeat",
+    "range_ElectronAffinity",
+    "std_atomic_radius",
+    "range_atomic_radius",
+    "entropy_ElectronAffinity",
+    "entropy_fie",
+    "gmean_Density",
+    "wtd_std_fie"
+  ]
+}

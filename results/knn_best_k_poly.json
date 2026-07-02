@@ -1,0 +1,5 @@
+{
+  "best_k": 4,
+  "val_rmse": 9.921284798084946,
+  "n_features_used_for_tuning": 87
+}
