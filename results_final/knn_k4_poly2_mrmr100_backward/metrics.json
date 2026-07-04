@@ -1,0 +1,19 @@
+{
+  "model": "KNN",
+  "scaler": "Standard",
+  "polynomial": true,
+  "poly_degree": 2,
+  "mrmr": true,
+  "wrapper_selection": true,
+  "use_linear_selection": false,
+  "selection_method": "Backward",
+  "n_features": 73,
+  "best_k": 4,
+  "mse": 100.4228837636564,
+  "rmse": 10.021121881488938,
+  "mae": 5.375353350912212,
+  "r2": 0.9167604038672275,
+  "mape": 7.026663106884486,
+  "negative_predictions_count": 0,
+  "negative_predictions_pct": 0.0
+}

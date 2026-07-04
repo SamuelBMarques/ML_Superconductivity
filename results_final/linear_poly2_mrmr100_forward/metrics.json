@@ -1,0 +1,17 @@
+{
+  "model": "Linear",
+  "scaler": "Standard",
+  "polynomial": true,
+  "poly_degree": 2,
+  "mrmr": true,
+  "wrapper_selection": true,
+  "selection_method": "Forward",
+  "n_features": 87,
+  "mse": 273.4055733436355,
+  "rmse": 16.534980294624955,
+  "mae": 11.983515827311564,
+  "r2": 0.7733766582611358,
+  "mape": 6.91764456716096,
+  "negative_predictions_count": 107,
+  "negative_predictions_pct": 3.35423197492163
+}

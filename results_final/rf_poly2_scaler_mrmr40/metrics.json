@@ -1,0 +1,30 @@
+{
+  "model": "RandomForest",
+  "polynomial": true,
+  "poly_degree": 2,
+  "scaler": "Standard",
+  "mrmr": true,
+  "mrmr_k": 40,
+  "n_features": 40,
+  "best_params": {
+    "n_estimators": 300,
+    "criterion": "friedman_mse",
+    "max_depth": 30,
+    "min_samples_split": 5,
+    "min_samples_leaf": 2,
+    "min_weight_fraction_leaf": 0.0,
+    "max_leaf_nodes": null,
+    "min_impurity_decrease": 0.0,
+    "max_features": "sqrt",
+    "ccp_alpha": 0.01,
+    "bootstrap": false,
+    "max_samples": null
+  },
+  "mse": 95.55886231074619,
+  "rmse": 9.775421336737676,
+  "mae": 5.684873141877994,
+  "r2": 0.9207921460971584,
+  "mape": 6.188972576631018,
+  "negative_predictions_count": 0,
+  "negative_predictions_pct": 0.0
+}
