@@ -1,26 +1,161 @@
-# ML_Superconductivity
+# 🧪 Machine Learning for Superconductivity
 
-This project focuses on predicting the Critical Temperature ($T_c$) of superconducting materials based on their chemical and physical properties using machine learning techniques. It utilizes the public dataset provided by Dr. Kam Hamidieh from the UCI Machine Learning Repository.
+A **Machine Learning project applied to materials science**, focused on predicting the **critical temperature (`Tc`) of superconducting materials** from their chemical and physical properties.
 
-## How It Works
+The project uses the publicly available superconductivity dataset provided by **Kam Hamidieh** through the UCI Machine Learning Repository.
 
-The application performs data preprocessing, exploratory data analysis (EDA), and builds regression models to estimate the critical temperature of superconductors.
+---
 
-1. **Data Processing**: Loads dataset consisting of 21,263 superconducting compounds and 81 features extracted from their chemical formulas.
-2. **Feature Engineering & Scaling**: Handles missing values/duplicates and applies `StandardScaler` to standardize feature scales across different physical properties.
-3. **Dimensionality Reduction**: Utilizes Principal Component Analysis (PCA) for visualization and feature exploration.
-4. **Model Training & Evaluation**: Evaluates multiple regression models (Linear Regression, Support Vector Regressors, Random Forests, Gradient Boosting) using K-Fold Cross-Validation.
+## 🎯 Objective
 
-## Features
+The **critical temperature (`Tc`)** is the temperature below which a material exhibits superconducting behavior.
 
-* **Exploratory Data Analysis**: Includes correlation matrix visualization and PCA projections in 2D/3D.
-* **Comparative Model Benchmark**: Compares linear vs. non-linear algorithms based on metrics such as $R^2$, RMSE, and MAE.
-* **Robust Preprocessing**: Standardizes raw physical properties (e.g., atomic mass, thermal conductivity, electron affinity) for machine learning compatibility.
+The goal of this project is to use **regression techniques** to estimate the critical temperature of superconducting materials based on their properties.
 
-## Requirements
+The dataset contains:
 
-* Python 3.8+
-* pandas
-* numpy
-* scikit-learn
-* matplotlib
+* **21,263 superconducting compounds**
+* **81 features** derived from their chemical formulas
+
+---
+
+## 🔬 Machine Learning Pipeline
+
+The project follows a typical Machine Learning workflow:
+
+```text
+Dataset
+   ↓
+Data Preprocessing
+   ↓
+Exploratory Data Analysis
+   ↓
+Feature Engineering
+   ↓
+Feature Scaling
+   ↓
+PCA
+   ↓
+Model Training
+   ↓
+Model Evaluation
+```
+
+---
+
+## 🤖 Models
+
+Different regression algorithms were implemented to compare linear and non-linear approaches:
+
+* Linear Regression
+* K-Nearest Neighbors (KNN)
+* Support Vector Regression (SVR)
+* Random Forest
+* Gradient Boosting
+
+The models are evaluated using **K-Fold Cross-Validation**.
+
+---
+
+## 📊 Evaluation
+
+The models are compared using common regression metrics:
+
+* **R²** — Coefficient of Determination
+* **RMSE** — Root Mean Squared Error
+* **MAE** — Mean Absolute Error
+
+The project also includes exploratory analyses using **correlation matrices** and **2D/3D PCA visualizations**.
+
+---
+
+## 🛠️ Technologies
+
+* **Python**
+* **NumPy**
+* **Pandas**
+* **Scikit-learn**
+* **Matplotlib**
+* Machine Learning
+* Data Analysis
+* Data Visualization
+
+---
+
+## 📁 Project Structure
+
+```text
+ML_Superconductivity/
+│
+├── exploration/
+├── results/
+├── results_final/
+├── splits/
+├── superconductivty+data/
+│
+├── crit_temp_knn.py
+├── crit_temp_linearregression.py
+├── crit_temp_randomforest.py
+├── linear_regression.py
+├── prepare_data.py
+├── result_analysis.py
+│
+└── README.md
+```
+
+* `prepare_data.py` — Data preparation and preprocessing
+* `crit_temp_*.py` — Training and evaluation of different models
+* `linear_regression.py` — Linear regression implementation
+* `result_analysis.py` — Analysis and visualization of model results
+
+---
+
+## 💻 Requirements
+
+* Python `3.8+`
+* NumPy
+* Pandas
+* Scikit-learn
+* Matplotlib
+
+Install the dependencies with:
+
+```bash
+pip install numpy pandas scikit-learn matplotlib
+```
+
+---
+
+## ▶️ Usage
+
+First, prepare the dataset:
+
+```bash
+python prepare_data.py
+```
+
+Then, individual models can be trained and evaluated:
+
+```bash
+python crit_temp_knn.py
+python crit_temp_linearregression.py
+python crit_temp_randomforest.py
+```
+
+---
+
+## 📚 Dataset
+
+**Superconductivity Dataset**
+
+Provided by **Kam Hamidieh** through the **UCI Machine Learning Repository**.
+
+The dataset contains chemical and physical properties of superconducting materials, with the goal of predicting their critical temperature (`Tc`).
+
+---
+
+## 👨‍💻 Author
+
+**Samuel Braga Marques**
+
+GitHub: [@SamuelBMarques](https://github.com/SamuelBMarques)
